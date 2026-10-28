@@ -66,3 +66,19 @@ and the `loadRemote` chunk). The react loadShare wrapper, `localSharedImportMap`
 `JSON.stringify(stableConfigValue(options))`, and `stableConfigValue` drops only `implementation`.
 Before module-federation/vite#1167 the owner segment was a per-process counter, so changing only
 `filename` renamed nothing.
+
+## Fix
+
+Proposed upstream in https://github.com/module-federation/vite/pull/1509: hash the options without
+`filename`, and use `filename` only when it is the one difference between two instances in the
+same process.
+
+With that branch (`pnpm build && pnpm pack`) installed in place of 1.23.6:
+
+| Builds | Scope key | Files renamed |
+| --- | --- | --- |
+| only `filename` differs | `104004152475523` both times | 5 of 13 |
+| control, same `filename` | `104004152475523` both times | 0 of 13 |
+
+The five are the expected ones: `remoteEntry.aaaaaaaa.js`, `hostInit`, `index`,
+`mf-entry-bootstrap-0` and the `loadRemote` chunk.
